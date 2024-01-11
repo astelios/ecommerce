@@ -127,9 +127,6 @@ def submit_review(request, product_id):
     return product(request, product_id)
 
 def add_to_cart(request, product_id):
-<<<<<<< Updated upstream
-    q = request.GET.get('q', '')
-=======
 
     cookie_value, cart_instance = cookie_and_cart(request)
     product_instance = Product.objects.get(id=product_id)
@@ -144,7 +141,6 @@ def add_to_cart(request, product_id):
         cart_item_instance.save()
     except CartItem.DoesNotExist:
         cart_item_instance = CartItem.objects.create(cart=cart_instance, product=product_instance, quantity=1)
->>>>>>> Stashed changes
 
     data = {'cart_badge_number' : cart_instance.number_of_items}
 
