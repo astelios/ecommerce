@@ -7,6 +7,18 @@ class Cart(models.Model):
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     number_of_items = models.PositiveIntegerField()
 
+    @property
+    def get_cart_total(self):
+        cartitem = self.cartitem_set.all()
+        total = sum([item.get_total for item in  cartitem])
+        return total
+        
+    @property
+    def get_cart_items(self):
+        cartitem = self.cartitem_set.all()
+        total = sum([item.quantity for item in cartitem])
+        return total
+
 
 class Guest(models.Model):
     cart = models.OneToOneField(Cart, null=True, blank=True, on_delete=models.CASCADE)
@@ -66,6 +78,11 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField()
+
+    @property
+    def get_total(self):
+        total = self.product.price * self.quantity
+        return total
 
 
 class Order(models.Model):
