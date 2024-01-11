@@ -61,6 +61,24 @@
 		crossorigin="anonymous"></script>
 
 	<script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
+
+	<script>
+		// Get the button and counter element
+		var incrementButton = document.getElementById('add-to-cart-button');
+		var counterElement = document.getElementById('cart-badge');
+
+		// Initialize counter variable
+		var counter = parseInt(counterElement.textContent, 10);
+
+		// Attach click event listener to the button
+		incrementButton.addEventListener('click', function() {
+			// Increment the counter
+			counter++;
+
+			// Update the counter element text
+			counterElement.textContent = counter;
+		});
+	</script>
 </body>
 
 </html>
