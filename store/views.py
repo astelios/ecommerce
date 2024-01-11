@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.db.models import Avg
 from django.contrib.auth import login, authenticate, logout
@@ -142,11 +142,7 @@ def add_to_cart(request, product_id):
     except CartItem.DoesNotExist:
         cart_item_instance = CartItem.objects.create(cart=cart_instance, product=product_instance, quantity=1)
 
-    data = {'cart_badge_number' : cart_instance.number_of_items}
-
-    response = JsonResponse(data)
-    response['Content-Type'] = 'application/json'
-    return response
+    return HttpResponse(status=204) # response for success
 
 # Store template
 
