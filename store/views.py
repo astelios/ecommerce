@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.db.models import Avg
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import *
 from .forms import *
@@ -99,21 +100,30 @@ def register(request):
 
     return render(request, 'store/register.html', {'form': form})
 
-def product(request):
-    q = request.GET.get('q', '')
+def product(request, product_id):
     
-    product = Product.objects.get(id=q)
+    product = Product.objects.get(id=product_id)
     cookie_value, cart = cookie_and_cart(request)
-    reviews = Review.objects.filter(product__id=q)
+    reviews = Review.objects.filter(product__id=product_id)
     avg_rating = reviews.aggregate(Avg("rating", default=0))
-    context = {'product' : product, 'cart' : cart, 'reviews' : reviews, 'avg_rating' : avg_rating}
+    context = {'product' : product, 'cart' : cart, 'reviews' : reviews, 'avg_rating' : avg_rating, 'form' : ReviewForm()}
 
     return render(request, 'store/product.html', context)
 
-def submit_review(request):
-    context = []
+@login_required
+def submit_review(request, product_id):
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            # Set the user and product fields before saving
+            review = form.save(commit=False)
+            review.user = request.user  # Set the current logged-in user
+            review.product = Product.objects.get(id=product_id)  # Set the specific product
+            review.save()
+    else:
+        form = ReviewForm()
 
-    return store(request)
+    return product(request, product_id)
 
 def add_to_cart(request):
     q = request.GET.get('q', '')

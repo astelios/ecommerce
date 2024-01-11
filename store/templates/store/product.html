@@ -38,36 +38,15 @@
     <div class="col-lg-4">
         <h2 class="mb-4">Write a Review</h2>
         
-        <form method="post" action="{% url 'submit_review' %}">
+        {% if user.is_authenticated %}
+        <!-- Write Review -->
+        <form method="post" action="{% url 'submit_review' product.id %}">
             {% csrf_token %}
-            
-            <!-- User Name -->
-            <div class="form-group">
-                <label for="userName">Your Name:</label>
-                <input type="text" class="form-control" id="userName" name="userName" required>
-            </div>
-
-            <!-- Review Text -->
-            <div class="form-group">
-                <label for="reviewText">Your Review:</label>
-                <textarea class="form-control" id="reviewText" name="reviewText" rows="4" required></textarea>
-            </div>
-
-            <!-- Rating -->
-            <div class="form-group">
-                <label for="rating">Rating:</label>
-                <select class="form-control" id="rating" name="rating" required>
-                    <option value="5">5 stars</option>
-                    <option value="4">4 stars</option>
-                    <option value="3">3 stars</option>
-                    <option value="2">2 stars</option>
-                    <option value="1">1 star</option>
-                </select>
-            </div>
-
+            {{form.as_p}}
             <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">Submit Review</button>
+            <button type="submit" class="btn btn-primary mb-3">Submit Review</button>
         </form>
+        {% endif %}
 
         <!-- Comments -->
         {% for review in reviews %}
@@ -82,6 +61,7 @@
             </div>
         </div>
         {% endfor %}
+        <br>
     </div>
 </div>
 
