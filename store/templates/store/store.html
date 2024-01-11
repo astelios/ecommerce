@@ -84,7 +84,7 @@
 					<div class="box-element product">
 						<h6><strong>{{product.name}}</strong></h6>
 						<hr />
-						<a class="btn btn-outline-secondary add-btn" href="{% url 'add_to_cart' %}?q={{product.id}}">Add
+						<a class="btn btn-outline-secondary add-btn" href="{% url 'add_to_cart' product.id %}">Add
 							to Cart</a>
 						<a class="btn btn-outline-success" href="{% url 'product' product.id %}">View</a>
 						<h4 style="display: inline-block; float: right;">

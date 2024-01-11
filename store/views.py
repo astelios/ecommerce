@@ -125,7 +125,7 @@ def submit_review(request, product_id):
 
     return product(request, product_id)
 
-def add_to_cart(request):
+def add_to_cart(request, product_id):
     q = request.GET.get('q', '')
 
     return
