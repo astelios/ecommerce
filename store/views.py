@@ -22,13 +22,21 @@ def generate_random_cookie():
 # Returns cookie value and cart instance 
 def cookie_and_cart(request):
     cookie_value = request.COOKIES.get('user_cookie', '')
-    if cookie_value:
+    # if cookie_value:
+    #     guest_instance = Guest.objects.get(cookie=cookie_value)
+    #     cart_instance = guest_instance.cart
+    # else:
+    #     cart_instance = Cart.objects.create(number_of_items=0)
+    #     cookie_value = generate_random_cookie()
+    #     Guest.objects.create(cart=cart_instance ,cookie=cookie_value)  
+
+    try:
         guest_instance = Guest.objects.get(cookie=cookie_value)
         cart_instance = guest_instance.cart
-    else:
+    except Guest.DoesNotExist:
         cart_instance = Cart.objects.create(number_of_items=0)
         cookie_value = generate_random_cookie()
-        Guest.objects.create(cart=cart_instance ,cookie=cookie_value)        
+        Guest.objects.create(cart=cart_instance ,cookie=cookie_value)      
 
     return cookie_value, cart_instance
 
@@ -49,22 +57,24 @@ def build_store_cookie(request, products):
 def cart(request):
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create()
-        items = order.orderitem_set.all()
+        cart, created = Cart.objects.get_or_create()
+        items = cart.cartitem_set.all()
     else:
         items = []
-    context={'items':items, 'order': order}
+        cart = None
+    context={'items':items, 'cart': cart}
 
     return render(request, 'store/cart.html', context)
 
 def checkout(request):
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create()
-        items = order.orderitem_set.all()
+        cart, created = Cart.objects.get_or_create()
+        items = cart.cartitem_set.all()
     else:
         items = []
-    context={'items':items, 'order': order}
+        cart = None
+    context={'items':items, 'cart': cart}
 
     return render(request, 'store/checkout.html', context)
 
