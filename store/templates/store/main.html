@@ -44,7 +44,7 @@
 
 			<a class="btn btn-outline-secondary position-relative ms-2" href="{% url 'cart' %}" role="button">
 				<img id="cart-icon" src="{% static 'images/cart.png' %}" />
-				<span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-danger">
+				<span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-danger" id="cart-badge">
 					{{cart.number_of_items}}
 				</span>
 			</a>

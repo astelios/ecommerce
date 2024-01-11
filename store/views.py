@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.db.models import Avg
 from django.contrib.auth import login, authenticate, logout
@@ -128,18 +129,24 @@ def submit_review(request, product_id):
 def add_to_cart(request, product_id):
 
     cookie_value, cart_instance = cookie_and_cart(request)
+    product_instance = Product.objects.get(id=product_id)
+
     cart_instance.number_of_items += 1
-    
     cart_instance.save()
 
-    cart_item_instance = CartItem.objects.get(product__id = product_id, cart = cart_instance)
+    try:
+        cart_item_instance = CartItem.objects.get(product__id=product_id, cart=cart_instance)
 
-    if cart_item_instance :
-        cart_instance.quantity += 1
-    
-    cart_item_instance.save()
+        cart_item_instance.quantity += 1
+        cart_item_instance.save()
+    except CartItem.DoesNotExist:
+        cart_item_instance = CartItem.objects.create(cart=cart_instance, product=product_instance, quantity=1)
 
-    return
+    data = {'cart_badge_number' : cart_instance.number_of_items}
+
+    response = JsonResponse(data)
+    response['Content-Type'] = 'application/json'
+    return response
 
 # Store template
 
