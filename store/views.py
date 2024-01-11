@@ -126,7 +126,18 @@ def submit_review(request, product_id):
     return product(request, product_id)
 
 def add_to_cart(request, product_id):
-    q = request.GET.get('q', '')
+
+    cookie_value, cart_instance = cookie_and_cart(request)
+    cart_instance.number_of_items += 1
+    
+    cart_instance.save()
+
+    cart_item_instance = CartItem.objects.get(product__id = product_id, cart = cart_instance)
+
+    if cart_item_instance :
+        cart_instance.quantity += 1
+    
+    cart_item_instance.save()
 
     return
 
