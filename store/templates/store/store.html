@@ -1,182 +1,104 @@
 {% extends 'store/main.html' %} {% load static %} {% block content %}
 
 <div class="container-fluid text-center">
-  <!-- Search Bar -->
-  <form action="{% url 'search' %}" method="post">
-    {% csrf_token %}
-    <div class="form-group d-inline-flex mb-3">
-      <input
-        class="form-control me-2"
-        name="searchField"
-        type="search"
-        placeholder="Search"
-        aria-label="Search"
-      />
-      <button class="btn btn-outline-success me-2" type="submit">Search</button>
-      <button
-        class="btn btn-outline-primary"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#collapseFilter"
-        aria-expanded="false"
-        aria-controls="collapseFilter"
-      >
-        Filters
-      </button>
-    </div>
-    <!-- Collapsable filter field -->
-    <div class="collapse" id="collapseFilter">
-      <div class="form-group d-inline-flex">
-        <div class="form-group me-2">
-          <h4>Categories</h4>
-          <ul class="list-group">
-            {% for category in categories %}
-            <li class="list-group-item d-flex justify-content-start">
-              <input
-                class="me-2"
-                type="checkbox"
-                id="{{category.name}}"
-                name="{{category.name}}"
-                value="on"
-              />
-              <label for="{{category.name}}">{{category.name}}</label>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
-        <div class="form-group me-2">
-          <h4>Brands</h4>
-          <ul class="list-group">
-            {% for brand in brands %}
-            <li class="list-group-item d-flex justify-content-start">
-              <input
-                class="me-2"
-                type="checkbox"
-                id="{{brand.name}}"
-                name="{{brand.name}}"
-                value="on"
-              />
-              <label for="{{brand.name}}">{{brand.name}}</label>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
-        <div class="form-group me-2">
-          <h4>Price Range</h4>
-          <label for="priceStart">From:</label>
-          <input
-            type="number"
-            class="form-control"
-            id="priceStart"
-            name="priceStart"
-            placeholder="0"
-            step="0.01"
-            min="0"
-            max="100000"
-          />
-          <label for="priceEnd">Up to:</label>
-          <input
-            type="number"
-            class="form-control mb-3"
-            id="priceEnd"
-            name="priceEnd"
-            placeholder="~"
-            step="0.01"
-            min="0"
-            max="100000"
-          />
-          <label class="me-2" for="availability">
-            <h4>Available</h4>
-          </label>
-          <input
-            type="checkbox"
-            id="availability"
-            name="availability"
-            value="on"
-          />
-        </div>
-      </div>
-    </div>
-  </form>
-  <hr />
+	<!-- Search Bar -->
+	<form action="{% url 'search' %}" method="post">
+		{% csrf_token %}
+		<div class="form-group d-inline-flex mb-3">
+			<input class="form-control me-2" name="searchField" type="search" placeholder="Search"
+				aria-label="Search" />
+			<button class="btn btn-outline-success me-2" type="submit">Search</button>
+			<button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse"
+				data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+				Filters
+			</button>
+		</div>
+		<!-- Collapsable filter field -->
+		<div class="collapse" id="collapseFilter">
+			<div class="form-group d-inline-flex">
+				<div class="form-group me-2">
+					<h4>Categories</h4>
+					<ul class="list-group">
+						{% for category in categories %}
+						<li class="list-group-item d-flex justify-content-start">
+							<input class="me-2" type="checkbox" id="{{category.name}}" name="{{category.name}}"
+								value="on" />
+							<label for="{{category.name}}">{{category.name}}</label>
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
+				<div class="form-group me-2">
+					<h4>Brands</h4>
+					<ul class="list-group">
+						{% for brand in brands %}
+						<li class="list-group-item d-flex justify-content-start">
+							<input class="me-2" type="checkbox" id="{{brand.name}}" name="{{brand.name}}" value="on" />
+							<label for="{{brand.name}}">{{brand.name}}</label>
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
+				<div class="form-group me-2">
+					<h4>Price Range</h4>
+					<label for="priceStart">From:</label>
+					<input type="number" class="form-control" id="priceStart" name="priceStart" placeholder="0"
+						step="0.01" min="0" max="100000" />
+					<label for="priceEnd">Up to:</label>
+					<input type="number" class="form-control mb-3" id="priceEnd" name="priceEnd" placeholder="~"
+						step="0.01" min="0" max="100000" />
+					<label class="me-2" for="availability">
+						<h4>Available</h4>
+					</label>
+					<input type="checkbox" id="availability" name="availability" value="on" />
+				</div>
+			</div>
+		</div>
+	</form>
+	<hr />
 
-  <div class="row">
-    <!-- Category bar -->
-    <div class="col-lg-2 category-wrapper">
-      <h2>Categories</h2>
-      <ul class="list-group">
-        {% for category in categories %}
-        <a href="{% url 'category' %}?q={{category.name}}">
-          <li class="list-group-item category">
-            <strong>{{category.name}}</strong>
-          </li>
-        </a>
-        {% endfor %}
-      </ul>
-    </div>
-    <!-- Products display -->
-    <div class="col-lg-8">
-      <div class="row">
-        {% for product in products %}
-        <div class="col-lg-4">
-          <div class="thumbnail-wrapper">
-            {% if product.image %}
-            <img class="thumbnail" src="{{product.image.url}}" />
-            {% else %}
-            <img
-              src="{% static 'images/placeholder.png' %}"
-              class="thumbnail"
-            />
-            {% endif %}
-          </div>
-          <div class="box-element product">
-            <h6><strong>{{product.name}}</strong></h6>
-            <hr />
-            <a
-              class="btn btn-outline-secondary add-btn"
-              id="add-to-cart-button"
-              href="{% url 'add_to_cart' product.id %}"
-              >Add to Cart</a
-            >
-            <a
-              class="btn btn-outline-success"
-              href="{% url 'product' product.id %}"
-              >View</a
-            >
-            <h4 style="display: inline-block; float: right">
-              <strong>${{product.price|floatformat:2}}</strong>
-            </h4>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
+	<div class="row">
+		<!-- Category bar -->
+		<div class="col-lg-2 category-wrapper">
+			<h2>Categories</h2>
+			<ul class="list-group">
+				{% for category in categories %}
+				<a href="{% url 'category' %}?q={{category.name}}">
+					<li class="list-group-item category">
+						<strong>{{category.name}}</strong>
+					</li>
+				</a>
+				{% endfor %}
+			</ul>
+		</div>
+		<!-- Products display -->
+		<div class="col-lg-8">
+			<div class="row">
+				{% for product in products %}
+				<div class="col-lg-4">
+					<div class="thumbnail-wrapper">
+						{% if product.image %}
+						<img class="thumbnail" src="{{product.image.url}}" />
+						{% else %}
+						<img src="{% static 'images/placeholder.png' %}" class="thumbnail" />
+						{% endif %}
+					</div>
+					<div class="box-element product">
+						<h6><strong>{{product.name}}</strong></h6>
+						<hr />
+						<a class="btn btn-outline-secondary add-btn add-btn add-to-cart-button"
+							href="{% url 'add_to_cart' product.id %}">Add to Cart</a>
+						<a class="btn btn-outline-success" href="{% url 'product' product.id %}">View</a>
+						<h4 style="display: inline-block; float: right">
+							<strong>${{product.price|floatformat:2}}</strong>
+						</h4>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
 </div>
 
-<!-- Add this script in your HTML template
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    var addToCartButtons = document.querySelectorAll(".add-btn");
-
-    addToCartButtons.forEach(function (button) {
-      button.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        var productId = button.getAttribute("data-product-id");
-        var url = "/add_to_cart/" + productId + "/";
-
-        // Using Fetch API to send a POST request
-        fetch(url, { method: "POST" })
-          .then((response) => response.json())
-          .then((data) => {
-            // Update the cart badge or perform any other actions
-            console.log("Cart badge number:", data.cart_badge_number);
-          })
-          .catch((error) => console.error("Error:", error));
-      });
-    });
-  });
-</script> -->
 
 {% endblock content %}

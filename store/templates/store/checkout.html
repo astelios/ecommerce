@@ -1,145 +1,123 @@
 {% extends 'store/main.html' %} {% load static %} {% block content %}
 
+<!--
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
 <script>
-  $(document).ready(function () {
-    $("#shipping-order-form").submit(function (e) {
-      e.preventDefault(); // Prevent the default form submission
+	$(document).ready(function () {
+		$("#shipping-order-form").submit(function (e) {
+			e.preventDefault(); // Prevent the default form submission
 
-      // Collect form data, including CSRF token
-      var formData = $(this).serialize();
+			// Collect form data, including CSRF token
+			var formData = $(this).serialize();
 
-      // Get the CSRF token from the form
-      var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+			// Get the CSRF token from the form
+			var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
 
-      console.log("CSRF Token:", csrfToken);
+			console.log("CSRF Token:", csrfToken);
 
-      // Send AJAX request to submit the form
-      $.ajax({
-        type: "POST",
-        url: $(this).attr("action"),
-        headers: { "X-CSRFToken": csrfToken },
-        data: formData,
-        dataType: "json", // Expect JSON response
-        success: function (response) {
-          if (response.success) {
-            // Handle success (e.g., show a success message)
-            console.log("Form submitted successfully");
-          } else {
-            // Handle server-side validation errors if needed
-            console.error("Form submission failed:", response.errors);
-          }
-        },
-        error: function (error) {
-          // Handle errors
-          console.error("Error submitting form:", error);
-        },
-      });
-    });
-  });
-</script>
+			// Send AJAX request to submit the form
+			$.ajax({
+				type: "POST",
+				url: $(this).attr("action"),
+				headers: { "X-CSRFToken": csrfToken },
+				data: formData,
+				dataType: "json", // Expect JSON response
+				success: function (response) {
+					if (response.success) {
+						// Handle success (e.g., show a success message)
+						console.log("Form submitted successfully");
+					} else {
+						// Handle server-side validation errors if needed
+						console.error("Form submission failed:", response.errors);
+					}
+				},
+				error: function (error) {
+					// Handle errors
+					console.error("Error submitting form:", error);
+				},
+			});
+		});
+	});
+</script>-->
 
 <div class="row">
-  <div class="col-lg-6">
-    <div class="box-element" id="form-wrapper">
-      <form id="shipping-order-form">
-        {% csrf_token %}
-        <div class="user-info">
-          <div class="form-field">
-            <input
-              type="text"
-              name="name"
-              required
-              class="form-control"
-              placeholder="Name.."
-            />
-          </div>
-          <div class="form-field">
-            <input
-              type="email"
-              name="email"
-              required
-              class="form-control"
-              placeholder="Email.."
-            />
-          </div>
-        </div>
-        <div class="shopping-info">
-          <hr />
-          <p>Shipping Information:</p>
-          <div class="form-field">
-            <input
-              type="text"
-              name="address"
-              required
-              class="form-control"
-              placeholder="Address.."
-            />
-            <div class="form-field">
-              <input
-                type="text"
-                name="city"
-                required
-                class="form-control"
-                placeholder="City.."
-              />
-            </div>
-            <div class="form-field">
-              <input
-                type="text"
-                name="state"
-                required
-                class="form-control"
-                placeholder="State.."
-              />
-            </div>
-            <div class="form-field">
-              <input
-                type="text"
-                name="country"
-                required
-                class="form-control"
-                placeholder="Country.."
-              />
-            </div>
-          </div>
-        </div>
-        <hr />
-        <input
-          type="submit"
-          value="Continue"
-          id="form-button"
-          class="btn bnt-success btn-block"
-        />
-      </form>
-    </div>
-    <br />
-    <div class="box-element hidden" id="payment-info">
-      <small>Paypal Option</small>
-    </div>
-  </div>
-  <div class="col-lg-6">
-    <div class="box-element">
-      <div class="btn btn-outline-dark" href="{% url 'cart' %}">
-        &#x2190;Back to Cart
-      </div>
-      <hr />
-      <h4>Order Summary</h4>
-      <hr />
-      {% for item in items %}
-      <div class="cart-row">
-        <div style="flex: 2">
-          <img src="{% static 'images/placeholder.png'%}" class="row-image" />
-        </div>
-        <div style="flex: 2"><p>{{item.product.name}}</p></div>
-        <div style="flex: 1"><p>${{item.product.price}}</p></div>
-        <div style="flex: 1"><p>x{{item.quantity}}</p></div>
-      </div>
-      {% endfor %}
-      <h5>Items: {{cart.get_cart_items}}</h5>
-      <h5>Total: ${{cart.get_cart_total}}</h5>
-    </div>
-  </div>
+	<div class="col-lg-6">
+		<div class="box-element" id="form-wrapper">
+			<form id="shipping-order-form" action="{% url 'shipping_order' %}" method="post">
+				{% csrf_token %}
+				<div class="user-info">
+					{% if not user.is_authenticated %}
+					<div class="form-field">
+						<input type="text" name="{{ form.name.name }}" required class="form-control" placeholder="Name.." />
+					</div>
+					<div class="form-field">
+						<input type="email" name="{{ form.email.name }}" required class="form-control" placeholder="Email.." />
+					</div>
+					{% else %}
+					<div class="form-field">
+						<input type="hidden" name="{{ form.name.name }}" value="{{ user.username }}" required class="form-control" placeholder="Name.." />
+					</div>
+					<div class="form-field">
+						<input type="hidden" name="{{ form.email.name }}" value="{{ user.email }}" required class="form-control" placeholder="Email.." />
+					</div>
+					{% endif %}
+				</div>
+				<div class="shopping-info">
+					<hr />
+					<p>Shipping Information:</p>
+					<div class="form-field">
+						<input type="text" name="{{ form.address.name }}" required class="form-control" placeholder="Address.." />
+						<div class="form-field">
+							<input type="text" name="{{ form.city.name }}" required class="form-control" placeholder="City.." />
+						</div>
+						<div class="form-field">
+							<input type="text" name="{{ form.state.name }}" required class="form-control" placeholder="State.." />
+						</div>
+						<div class="form-field">
+							<input type="text" name="{{ form.zip_code.name }}" required class="form-control" placeholder="Zip_code.." />
+						</div>
+					</div>
+				</div>
+				<hr />
+				<button type="submit" value="Continue" id="form-button" class="btn bnt-success btn-block">Continue</button>
+			</form>
+		</div>
+		<br />
+		<div class="box-element hidden" id="payment-info">
+			<small>Paypal Option</small>
+		</div>
+	</div>
+	<div class="col-lg-6">
+		<div class="box-element">
+			<a class="btn btn-outline-dark" href="{% url 'cart' %}">
+				&#x2190;Back to Cart
+			</a>
+			<hr />
+			<h4>Order Summary</h4>
+			<hr />
+			{% for item in items %}
+			<div class="cart-row">
+				<div style="flex: 2">
+					{% if item.product.image %}
+					<img class="thumbnail" src="{{item.product.image.url}}">
+					{% else %}
+					<img class="thumbnail" src="{% static 'images/placeholder.png' %}">
+					{% endif %}
+				</div>
+				<div style="flex: 2">
+					<p>{{item.product.name}}</p>
+				</div>
+				<div style="flex: 1">
+					<p>${{item.product.price}}</p>
+				</div>
+				<div style="flex: 1">
+					<p>x{{item.quantity}}</p>
+				</div>
+			</div>
+			{% endfor %}
+			<h5>Items: {{cart.get_cart_items}}</h5>
+			<h5>Total: ${{cart.get_cart_total|floatformat:2}}</h5>
+		</div>
+	</div>
 </div>
 {% endblock content %}

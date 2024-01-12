@@ -44,7 +44,7 @@
 
 			<a class="btn btn-outline-secondary position-relative ms-2" href="{% url 'cart' %}" role="button">
 				<img id="cart-icon" src="{% static 'images/cart.png' %}" />
-				<span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-danger" id="cart-badge">
+				<span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-danger cart-counter">
 					{{cart.number_of_items}}
 				</span>
 			</a>
@@ -62,21 +62,95 @@
 
 	<script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
 
+	<!-- script for incrementing cart badge -->
 	<script>
-		// Get the button and counter element
-		var incrementButton = document.getElementById('add-to-cart-button');
-		var counterElement = document.getElementById('cart-badge');
+		document.addEventListener('DOMContentLoaded', function () {
+			// Increment card badge start
+			var incrementButtons = document.querySelectorAll('.add-to-cart-button');
+			var counterElements = document.querySelectorAll('.cart-counter');
 
-		// Initialize counter variable
-		var counter = parseInt(counterElement.textContent, 10);
+			var counter = parseInt("{{cart.number_of_items}}", 10);
 
-		// Attach click event listener to the button
-		incrementButton.addEventListener('click', function() {
-			// Increment the counter
-			counter++;
+			incrementButtons.forEach(function (button) {
+				button.addEventListener('click', function() {
+					counter++;
+					counterElements.forEach(function (counterElement) {
+						counterElement.textContent = counter;
+					});
+				});		
+			});
+			// Increment card badge end
 
-			// Update the counter element text
-			counterElement.textContent = counter;
+			// Increment decrement cart item quantity start
+			var removeButtons = document.querySelectorAll(".remove-from-cart-arrow");
+			var addButtons = document.querySelectorAll(".add-to-cart-arrow");
+			var totalElements = document.querySelectorAll('.cart-total')
+		
+			removeButtons.forEach(function (button) {
+				button.addEventListener("click", function (event) {
+					var quantityElement = button.closest(".cart-row").querySelector(".cart-item-quantity-counter");
+					var currentQuantity = parseInt(quantityElement.textContent, 10);
+					currentQuantity--;
+					quantityElement.textContent = currentQuantity;
+					var priceElement = button.closest(".cart-row").querySelector(".cart-item-price");
+					var price = parseFloat(priceElement.textContent.replace(/\$/, ''))
+					
+					if (currentQuantity == 0) {
+						var cartRow = button.closest(".cart-row");
+						cartRow.style.display = "none";
+					}
+					else { // recalculate subtotal
+						var itemTotalElement = button.closest(".cart-row").querySelector(".cart-item-total");
+						var itemTotal = parseFloat(itemTotalElement.textContent.replace(/\$/, ''));
+						itemTotal = itemTotal - price;
+						itemTotalElement.textContent = "$" + itemTotal.toFixed(2).toString();
+					}
+
+					// recalculate total
+					totalElements.forEach(function (totalElement) {
+						var cartTotal = parseFloat(totalElement.textContent.replace(/\$/, ''));
+						cartTotal = cartTotal - price;
+						totalElement.textContent = "$" + cartTotal.toFixed(2).toString();
+					});
+
+					// decrement cart badge
+					counter--;
+					counterElements.forEach(function (counterElement) {
+						counterElement.textContent = counter;
+					});
+				});
+			});
+	
+			addButtons.forEach(function (button) {
+				button.addEventListener("click", function (event) {
+					var quantityElement = button.closest(".cart-row").querySelector(".cart-item-quantity-counter");
+					var currentQuantity = parseInt(quantityElement.textContent, 10);
+					currentQuantity++;
+					quantityElement.textContent = currentQuantity;
+					var priceElement = button.closest(".cart-row").querySelector(".cart-item-price");
+					var price = parseFloat(priceElement.textContent.replace(/\$/, ''))
+					
+					// recalculate subtotal
+					var itemTotalElement = button.closest(".cart-row").querySelector(".cart-item-total");
+					var itemTotal = parseFloat(itemTotalElement.textContent.replace(/\$/, ''));
+					itemTotal = itemTotal + price;
+					itemTotalElement.textContent = "$" + itemTotal.toFixed(2).toString();
+
+					// recalculate total
+					totalElements.forEach(function (totalElement) {
+						var cartTotal = parseFloat(totalElement.textContent.replace(/\$/, ''));
+						cartTotal = cartTotal + price;
+						totalElement.textContent = "$" + cartTotal.toFixed(2).toString();
+					});
+
+					// increment cart badge
+					counter++;
+					counterElements.forEach(function (counterElement) {
+						counterElement.textContent = counter;
+					});
+				});
+			});
+			// Increment decrement cart item quantity end
 		});
 	</script>
 </body>

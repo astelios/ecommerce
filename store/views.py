@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.db.models import Avg
@@ -22,13 +22,6 @@ def generate_random_cookie():
 # Returns cookie value and cart instance 
 def cookie_and_cart(request):
     cookie_value = request.COOKIES.get('user_cookie', '')
-    # if cookie_value:
-    #     guest_instance = Guest.objects.get(cookie=cookie_value)
-    #     cart_instance = guest_instance.cart
-    # else:
-    #     cart_instance = Cart.objects.create(number_of_items=0)
-    #     cookie_value = generate_random_cookie()
-    #     Guest.objects.create(cart=cart_instance ,cookie=cookie_value)  
 
     try:
         guest_instance = Guest.objects.get(cookie=cookie_value)
@@ -39,6 +32,11 @@ def cookie_and_cart(request):
         Guest.objects.create(cart=cart_instance ,cookie=cookie_value)      
 
     return cookie_value, cart_instance
+
+def get_guest(request):
+    cookie_value = request.COOKIES.get('user_cookie', '')
+    return Guest.objects.get(cookie=cookie_value)
+
 
 # build store with provided filtered products/categories
 def build_store_cookie(request, products):
@@ -56,7 +54,6 @@ def build_store_cookie(request, products):
 
 def cart(request):
     if request.user.is_authenticated:
-        customer = request.user.customer
         cart, created = Cart.objects.get_or_create()
         items = cart.cartitem_set.all()
     else:
@@ -68,13 +65,12 @@ def cart(request):
 
 def checkout(request):
     if request.user.is_authenticated:
-        customer = request.user.customer
         cart, created = Cart.objects.get_or_create()
         items = cart.cartitem_set.all()
     else:
         items = []
         cart = None
-    context={'items':items, 'cart': cart}
+    context={'items':items, 'cart': cart, 'form':ShippingOrderForm()}
 
     return render(request, 'store/checkout.html', context)
 
@@ -137,30 +133,47 @@ def submit_review(request, product_id):
     return product(request, product_id)
 
 def add_to_cart(request, product_id):
-
     cookie_value, cart_instance = cookie_and_cart(request)
     product_instance = Product.objects.get(id=product_id)
 
-    cart_instance.number_of_items += 1
-    cart_instance.save()
-
     try:
         cart_item_instance = CartItem.objects.get(product__id=product_id, cart=cart_instance)
+        
+        if cart_item_instance.quantity < product_instance.stock:
+            print(cart_item_instance.quantity)
+            print(product_instance.stock)
+            cart_item_instance.quantity += 1
+            cart_item_instance.save()
+            cart_instance.number_of_items += 1
+            cart_instance.save()
+        else:
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
-        cart_item_instance.quantity += 1
-        cart_item_instance.save()
     except CartItem.DoesNotExist:
-        cart_item_instance = CartItem.objects.create(cart=cart_instance, product=product_instance, quantity=1)
+        if product_instance.stock > 0:
+            cart_item_instance = CartItem.objects.create(cart=cart_instance, product=product_instance, quantity=1)
+            cart_instance.number_of_items += 1
+            cart_instance.save()
+        else:
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
-<<<<<<< Updated upstream
     return HttpResponse(status=204) # response for success
-=======
-    data = {'cart_badge_number' : cart_instance.number_of_items}
 
-    response = JsonResponse(data)
-    # response['Content-Type'] = 'application/json'
-    return response
->>>>>>> Stashed changes
+def remove_from_cart(request, product_id):
+    cookie_value, cart_instance = cookie_and_cart(request)
+    product_instance = Product.objects.get(id=product_id)
+
+    cart_instance.number_of_items -= 1
+    cart_instance.save()
+
+    cart_item_instance = CartItem.objects.get(product__id=product_id, cart=cart_instance)
+    cart_item_instance.quantity -= 1
+    cart_item_instance.save()
+    if cart_item_instance.quantity == 0:
+        cart_item_instance.delete()
+
+    return HttpResponse(status=204) # response for success
+
 
 # Store template
 
@@ -215,26 +228,28 @@ def search(request):
     return build_store_cookie(request, products)
 
 def shipping_order(request):
-    if request.method == 'POST':
-        form = ShippingOrderForm(request.POST)
-        if form.is_valid():
-            # Save data to the database
-            shipping_order = ShippingOrder(
-                name=form.cleaned_data['name'],
-                email=form.cleaned_data['email'],
-                address=form.cleaned_data['address'],
-                city=form.cleaned_data['city'],
-                state=form.cleaned_data['state'],
-                country=form.cleaned_data['country']
-            )
-            shipping_order.save()
+    form = ShippingOrderForm(request.POST)
+    print(form.is_valid())
+    print(form)
+    if form.is_valid():
+        # Create shippingOrder
+        shippingOrder = form.save(commit=False)
+        shippingOrder.guest = get_guest(request)
+        shippingOrder.save()
 
-            # Redirect to a success page or do something else
-            return JsonResponse({'success': True})
-    # else:
-    #     form = ShippingOrderForm()
+        # Create orderItems
+        cartItems = CartItem.objects.filter(cart=shippingOrder.guest.cart)
+        for cartItem in cartItems:
+            shippingOrder.guest.cart.number_of_items -= cartItem.quantity
+            cartItem.product.stock -= cartItem.quantity
+            cartItem.product.save()
+            OrderItem.objects.create(product=cartItem.product, shippingOrder=shippingOrder, quantity=cartItem.quantity)
+            cartItem.delete()
+        shippingOrder.guest.cart.save()
 
-    # return render(request, 'shipping.html', {'form': form})
-        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        return store(request)
+    else:
+        return checkout(request)
 
-    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+    
