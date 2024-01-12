@@ -22,3 +22,12 @@ class ReviewForm(forms.ModelForm):
             'rating': forms.Select(choices=Review.RATING_CHOICES, attrs={'class': 'form-control'}),
             'comment': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+
+class ShippingOrderForm(forms.Form):
+    name = forms.CharField(max_length=200)
+    email = forms.EmailField()
+    address = forms.CharField(max_length=200)
+    city = forms.CharField(max_length=200)
+    state = forms.CharField(max_length=200)
+    country = forms.CharField(max_length=200)

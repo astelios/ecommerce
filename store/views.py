@@ -219,3 +219,28 @@ def search(request):
         products = products.filter(stock__gt=0)
 
     return build_store_cookie(request, products)
+
+def shipping_order(request):
+    if request.method == 'POST':
+        form = ShippingOrderForm(request.POST)
+        if form.is_valid():
+            # Save data to the database
+            shipping_order = ShippingOrder(
+                name=form.cleaned_data['name'],
+                email=form.cleaned_data['email'],
+                address=form.cleaned_data['address'],
+                city=form.cleaned_data['city'],
+                state=form.cleaned_data['state'],
+                country=form.cleaned_data['country']
+            )
+            shipping_order.save()
+
+            # Redirect to a success page or do something else
+            return JsonResponse({'success': True})
+    # else:
+    #     form = ShippingOrderForm()
+
+    # return render(request, 'shipping.html', {'form': form})
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
