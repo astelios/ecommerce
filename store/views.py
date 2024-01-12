@@ -151,7 +151,15 @@ def add_to_cart(request, product_id):
     except CartItem.DoesNotExist:
         cart_item_instance = CartItem.objects.create(cart=cart_instance, product=product_instance, quantity=1)
 
+<<<<<<< Updated upstream
     return HttpResponse(status=204) # response for success
+=======
+    data = {'cart_badge_number' : cart_instance.number_of_items}
+
+    response = JsonResponse(data)
+    # response['Content-Type'] = 'application/json'
+    return response
+>>>>>>> Stashed changes
 
 def remove_from_cart(request, product_id):
     cookie_value, cart_instance = cookie_and_cart(request)

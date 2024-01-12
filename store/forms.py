@@ -23,7 +23,6 @@ class ReviewForm(forms.ModelForm):
             'comment': forms.Textarea(attrs={'class': 'form-control'}),
         }
 
-
 class ShippingOrderForm(forms.Form):
     name = forms.CharField(max_length=200)
     email = forms.EmailField()
