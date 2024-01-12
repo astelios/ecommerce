@@ -100,59 +100,46 @@
   </form>
   <hr />
 
-  <div class="row">
-    <!-- Category bar -->
-    <div class="col-lg-2 category-wrapper">
-      <h2>Categories</h2>
-      <ul class="list-group">
-        {% for category in categories %}
-        <a href="{% url 'category' %}?q={{category.name}}">
-          <li class="list-group-item category">
-            <strong>{{category.name}}</strong>
-          </li>
-        </a>
-        {% endfor %}
-      </ul>
-    </div>
-    <!-- Products display -->
-    <div class="col-lg-8">
-      <div class="row">
-        {% for product in products %}
-        <div class="col-lg-4">
-          <div class="thumbnail-wrapper">
-            {% if product.image %}
-            <img class="thumbnail" src="{{product.image.url}}" />
-            {% else %}
-            <img
-              src="{% static 'images/placeholder.png' %}"
-              class="thumbnail"
-            />
-            {% endif %}
-          </div>
-          <div class="box-element product">
-            <h6><strong>{{product.name}}</strong></h6>
-            <hr />
-            <a
-              class="btn btn-outline-secondary add-btn"
-              id="add-to-cart-button"
-              href="{% url 'add_to_cart' product.id %}"
-              >Add to Cart</a
-            >
-            <a
-              class="btn btn-outline-success"
-              href="{% url 'product' product.id %}"
-              >View</a
-            >
-            <h4 style="display: inline-block; float: right">
-              <strong>${{product.price|floatformat:2}}</strong>
-            </h4>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-</div>
+	<div class="row">
+		<!-- Category bar -->
+		<div class="col-lg-2 category-wrapper">
+			<h2>Categories</h2>
+			<ul class="list-group">
+				{% for category in categories %}
+				<a href="{% url 'category' %}?q={{category.name}}">
+					<li class="list-group-item category"><strong>{{category.name}}</strong></li>
+				</a>
+				{% endfor %}
+			</ul>
+		</div>
+		<!-- Products display -->
+		<div class="col-lg-8">
+			<div class="row">
+				{% for product in products %}
+				<div class="col-lg-4">
+					<div class="thumbnail-wrapper">
+						{% if product.image %}
+						<img class="thumbnail" src="{{product.image.url}}" />
+						{% else %}
+						<img src="{% static 'images/placeholder.png' %}" class="thumbnail" />
+						{% endif %}
+					</div>
+					<div class="box-element product">
+						<h6><strong>{{product.name}}</strong></h6>
+						<hr />
+						<a class="btn btn-outline-secondary add-btn add-to-cart-button"  href="{% url 'add_to_cart' product.id %}">Add
+							to Cart</a>
+						<a class="btn btn-outline-success" href="{% url 'product' product.id %}">View</a>
+						<h4 style="display: inline-block; float: right;">
+							<strong>${{product.price|floatformat:2}}</strong>
+						</h4>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+
 
 <!-- Add this script in your HTML template
 <script>

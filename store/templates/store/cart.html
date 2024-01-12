@@ -1,60 +1,66 @@
 {% extends 'store/main.html' %} {% load static %} {% block content %}
 <div class="row">
-  <div class="col-lg-12">
-    <div class="box-element">
-      <a href="" class="btn btn-outline-dark">&#x2190;Continue Shopping</a>
-      <br />
-      <br />
-      <table class="table">
-        <tr>
-          <th>
-            <h5>Items: <strong>{{cart.get_cart_items}}</strong></h5>
-          </th>
-          <th>
-            <h5>Total: <strong>${{cart.get_cart_total}}</strong></h5>
-          </th>
-          <th>
-            <a
-              style="float: right; margin: 5px"
-              href="{% url 'checkout' %}"
-              class="btn btn-success"
-              >Checkout</a
-            >
-          </th>
-        </tr>
-      </table>
-    </div>
-    <br />
-    <div class="box-element">
-        <div class="cart-row">
-            <div style="flex: 2;"></div>
-            <div style="flex: 2;"><strong>Item</strong></div>
-            <div style="flex: 1;"><strong>Price</strong></div>
-            <div style="flex: 1;"><strong>Quantity</strong></div>
-            <div style="flex: 1;"><strong>Total</strong></div>
-        </div>
-        {% for item in items %}
-        <div class="cart-row">
-            {% if product.image %}
-	            <img class="thumbnail" src="{{product.image.url}}">
-            {% else %}
-	            <img class="thumbnail" src="{% static 'images/placeholder.png' %}">
-            {% endif %}
-            <!-- <div style="flex: 2;"><img src="{% static 'images/placeholder.png' %}" class="row-image"></div> -->
-            <div style="flex: 2;"><p>{{item.product.name}}</p></div>
-            <div style="flex: 1;"><p>${{item.product.price|floatformat:2}}</p></div>
-            <div style="flex: 1;">
-                <p class="quantity">{{item.quantity}}</p>
-                <div class="quantity">
-                    <img class="chg-quantity" src="{% static 'images/arrow-up.png' %}" >
-                    <img class="chg-quantity" src="{% static 'images/arrow-down.png' %}" >
-                </div>
-            </div>
-            <div style="flex: 1;"><p>${{item.get_total|floatformat:2}}</p></div>
-        </div>
-        {% endfor %}
-    </div>
-    </div>
-  </div>
+	<div class="col-lg-12">
+		<div class="box-element">
+			<a href="" class="btn btn-outline-dark">&#x2190;Continue Shopping</a>
+			<br />
+			<br />
+			<table class="table">
+				<tr>
+					<th>
+						<h5>Items: <strong class="cart-counter">{{cart.get_cart_items}}</strong></h5>
+					</th>
+					<th>
+						<h5>Total: <strong class="cart-total">${{cart.get_cart_total|floatformat:2}}</strong></h5>
+					</th>
+					<th>
+						<a style="float: right; margin: 5px" href="{% url 'checkout' %}"
+							class="btn btn-success">Checkout</a>
+					</th>
+				</tr>
+			</table>
+		</div>
+		<br />
+		<div class="box-element">
+			<div class="cart-row">
+				<div style="flex: 2;"></div>
+				<div style="flex: 2;"><strong>Item</strong></div>
+				<div style="flex: 1;"><strong>Price</strong></div>
+				<div style="flex: 1;"><strong>Quantity</strong></div>
+				<div style="flex: 1;"><strong>Total</strong></div>
+			</div>
+			{% for item in items %}
+			<div class="cart-row">
+				{% if product.image %}
+				<img class="thumbnail" src="{{product.image.url}}">
+				{% else %}
+				<img class="thumbnail" src="{% static 'images/placeholder.png' %}">
+				{% endif %}
+				<!-- <div style="flex: 2;"><img src="{% static 'images/placeholder.png' %}" class="row-image"></div> -->
+				<div style="flex: 2;">
+					<p>{{item.product.name}}</p>
+				</div>
+				<div style="flex: 1;">
+					<p class="cart-item-price">${{item.product.price|floatformat:2}}</p>
+				</div>
+				<div style="flex: 1;">
+					<p class="quantity cart-item-quantity-counter">{{item.quantity}}</p>
+					<div class="quantity">
+						<a class="add-to-cart-arrow" href="{% url 'add_to_cart' item.product.id %}">
+							<img class="chg-quantity" src="{% static 'images/arrow-up.png' %}">
+						</a>
+						<a class="remove-from-cart-arrow" href="{% url 'remove_from_cart' item.product.id %}">
+							<img class="chg-quantity" src="{% static 'images/arrow-down.png' %}">
+						</a>
+					</div>
+				</div>
+				<div style="flex: 1;">
+					<p class="cart-item-total">${{item.get_total|floatformat:2}}</p>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
 </div>
+
 {% endblock content %}

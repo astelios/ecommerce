@@ -137,7 +137,6 @@ def submit_review(request, product_id):
     return product(request, product_id)
 
 def add_to_cart(request, product_id):
-
     cookie_value, cart_instance = cookie_and_cart(request)
     product_instance = Product.objects.get(id=product_id)
 
@@ -161,6 +160,21 @@ def add_to_cart(request, product_id):
     # response['Content-Type'] = 'application/json'
     return response
 >>>>>>> Stashed changes
+
+def remove_from_cart(request, product_id):
+    cookie_value, cart_instance = cookie_and_cart(request)
+    product_instance = Product.objects.get(id=product_id)
+
+    cart_instance.number_of_items -= 1
+    cart_instance.save()
+
+    cart_item_instance = CartItem.objects.get(product__id=product_id, cart=cart_instance)
+    cart_item_instance.quantity -= 1
+    cart_item_instance.save()
+    if cart_item_instance.quantity == 0:
+        cart_item_instance.delete()
+
+    return HttpResponse(status=204) # response for success
 
 # Store template
 
