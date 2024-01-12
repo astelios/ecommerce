@@ -10,7 +10,7 @@
     </div>
     <div class="col-lg-4">
         <h4 class="mb-3">{{product.name}}</h4>
-        <button class="btn btn-success add-btn mb-3">Add to Cart</button>
+        <a class="btn btn-success add-btn mb-3 add-to-cart-button" href="{% url 'add_to_cart' product.id %}">Add to Cart</a>
         <div class="row">
             <div class="col-sm-2 text-end">
                 <h5>Category:</h5>
