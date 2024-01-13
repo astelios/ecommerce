@@ -89,6 +89,18 @@ class ShippingOrder(models.Model):
     def __str__(self):
         return self.address 
     
+    @property
+    def get_order_total(self):
+        orderitem = self.orderitem_set.all()
+        total = sum([item.get_total for item in  orderitem])
+        return total
+        
+    @property
+    def get_order_items(self):
+        orderitem = self.orderitem_set.all()
+        total = sum([item.quantity for item in orderitem])
+        return total
+    
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)

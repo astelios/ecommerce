@@ -14,5 +14,7 @@ urlpatterns = [
     path('submit_review/<int:product_id>/', views.submit_review, name = 'submit_review'),
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name = 'add_to_cart'),
     path('remove_from_cart/<int:product_id>/', views.remove_from_cart, name = 'remove_from_cart'),
-    path('shipping_order/', views.shipping_order, name = 'shipping_order')
+    path('shipping_order/', views.shipping_order, name = 'shipping_order'),
+    path('order_history/', views.order_history, name = 'order_history'),
+    path('order/<int:order_id>/', views.order, name = 'order')
 ]

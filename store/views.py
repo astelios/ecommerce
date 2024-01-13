@@ -250,6 +250,21 @@ def shipping_order(request):
         return store(request)
     else:
         return checkout(request)
-
-
     
+def order(request, order_id):
+    order_instance = ShippingOrder.objects.get(id=order_id)
+    order_items = OrderItem.objects.filter(shippingOrder=order_instance)
+    context = {'order' : order_instance, 'items' : order_items, 'cart' : get_guest(request).cart}
+
+    return render(request, 'store/order.html', context)
+
+def order_history(request):
+    guest_ = get_guest(request)
+
+    try:
+        shipping_orders = ShippingOrder.objects.filter(guest=guest_)
+        context = {'items' : shipping_orders, 'cart' : guest_.cart}
+    except ShippingOrder.DoesNotExist:
+        context = {'cart' : guest_.cart}
+
+    return render(request, 'store/order_history.html', context)
